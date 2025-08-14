@@ -1,0 +1,52 @@
+name: IoT Data Quality Gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  databricks-quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1 — Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2 — Trigger Databricks notebook
+      - name: Trigger Databricks IoT Quality Check
+        id: run_databricks_job
+        uses: databricks/run-notebook@v0
+        with:
+          databricks-host: ${{ secrets.DATABRICKS_HOST }}
+          databricks-token: ${{ secrets.DATABRICKS_TOKEN }}
+          workspace-notebook-path: /Workspace/Users/traininguser5@sudosu.ai/iot_quality_check
+          existing-cluster-id: ${{ secrets.DATABRICKS_CLUSTER_ID }}
+          # Optionally pass input_path as widget if ADF/GitHub controls it
+          notebook-params: '{"input_path":"abfss://output@storage1srs.dfs.core.windows.net/"}'
+
+      # Step 3 — Download PyDeequ report from DBFS
+      - name: Download and Print Deequ Report
+        if: always()
+        run: |
+          pip install databricks-cli jq
+          databricks configure --token <<EOF
+          ${{ secrets.DATABRICKS_HOST }}
+          ${{ secrets.DATABRICKS_TOKEN }}
+          EOF
+          databricks fs cp dbfs:/FileStore/shared_uploads/traininguser5@sudosu.ai/iot_deequ_result.json ./iot_deequ_result.json
+          echo "------ IoT Deequ Output from Databricks ------"
+          cat iot_deequ_result.json
+          echo "----------------------------------------------"
+          STATUS=$(jq -r '.status' iot_deequ_result.json)
+          if [ "$STATUS" != "Success" ]; then
+            echo " IoT Data Quality Checks failed"
+            exit 1
+          fi
+          echo " IoT Data Quality Checks passed"
+
+      # Step 4 — Failure message (for visibility)
+      - name: IoT Deequ Failure Message
+        if: failure()
+        run: |
+          echo " IoT Deequ checks failed — see DBFS report for details."
