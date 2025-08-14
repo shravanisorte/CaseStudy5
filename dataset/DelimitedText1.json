@@ -1,0 +1,61 @@
+{
+	"name": "DelimitedText1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "sample.csv",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "PlantID",
+				"type": "String"
+			},
+			{
+				"name": "DeviceID",
+				"type": "String"
+			},
+			{
+				"name": "Timestamp (UTC)",
+				"type": "String"
+			},
+			{
+				"name": "Temperature_C",
+				"type": "String"
+			},
+			{
+				"name": "Humidity_pct",
+				"type": "String"
+			},
+			{
+				"name": "Vibration_mm_s",
+				"type": "String"
+			},
+			{
+				"name": "Pressure_bar",
+				"type": "String"
+			},
+			{
+				"name": "Energy_kWh",
+				"type": "String"
+			},
+			{
+				"name": "Status",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

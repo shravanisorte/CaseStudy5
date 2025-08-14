@@ -1,0 +1,9 @@
+{
+	"name": "Shravani-adf",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "fe292533-49b7-43d7-bb89-c3c722355666",
+		"tenantId": "b83e6911-8ded-4c6d-b4a7-eb4975c7e4da"
+	}
+}
